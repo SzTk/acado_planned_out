@@ -49,40 +49,40 @@ int main() {
   DiscretizedDifferentialEquation f(Ts), fsim(Ts);
 
   // Controller inner model
-  f << next(p) == p + p_dot * delta_t;
-  f << next(q) == q + q_dot * delta_t;
-  f << next(r) == r + r_dot * delta_t;
-  f << next(p_dot) == dup * u / 100.0 * p + dur * u / 100.0 * r +
-                          1.0 / 100.0 *
-                              (ddr1 * u * u * dr1 + ddr2 * u * u * dr2 +
-                               ddr3 * u * u * dr3 + ddr4 * u * u * dr4);
-  f << next(q_dot) ==
-      euq * u / 100.0 * q_dot +
+  (f << next(p)) == p + p_dot *delta_t;
+  (f << next(q)) == q + q_dot *delta_t;
+  (f << next(r)) == r + r_dot *delta_t;
+  (f << next(p_dot)) == dup *u / 100.0 * p + dur *u / 100.0 * r +
+                            1.0 / 100.0 *
+                                (ddr1 * u * u * dr1 + ddr2 * u * u * dr2 +
+                                 ddr3 * u * u * dr3 + ddr4 * u * u * dr4);
+  (f << next(q_dot)) ==
+      euq *u / 100.0 * q_dot +
           1.0 / 100.0 *
               (edb * u * u * db + edr1 * u * u * dr1 + edr2 * u * u * dr2 +
                edr3 * u * u * dr3 + edr4 * u * u * dr4);
-  f << next(r_dot) == fup * u / 100.0 * p + fur * u / 100.0 * r +
-                          1.0 / 100.0 *
-                              (fdr1 * u * u * dr1 + fdr2 * u * u * dr2 +
-                               fdr3 * u * u * dr3 + fdr4 * u * u * dr4);
+  (f << next(r_dot)) == fup *u / 100.0 * p + fur *u / 100.0 * r +
+                            1.0 / 100.0 *
+                                (fdr1 * u * u * dr1 + fdr2 * u * u * dr2 +
+                                 fdr3 * u * u * dr3 + fdr4 * u * u * dr4);
 
   // Plant model
-  fsim << next(p) == p + p_dot * delta_t + W * 1e-5;
-  fsim << next(q) == q + q_dot * delta_t + W * 1e-5;
-  fsim << next(r) == r + r_dot * delta_t + W * 1e-5;
-  fsim << next(p_dot) == dup * u / 100.0 * p + dur * u / 100.0 * r +
-                             1.0 / 100.0 *
-                                 (ddr1 * u * u * dr1 + ddr2 * u * u * dr2 +
-                                  ddr3 * u * u * dr3 + ddr4 * u * u * dr4);
-  fsim << next(q_dot) ==
-      euq * u / 100.0 * q_dot +
+  (fsim << next(p)) == p + p_dot *delta_t + W * 1e-5;
+  (fsim << next(q)) == q + q_dot *delta_t + W * 1e-5;
+  (fsim << next(r)) == r + r_dot *delta_t + W * 1e-5;
+  (fsim << next(p_dot)) == dup *u / 100.0 * p + dur *u / 100.0 * r +
+                               1.0 / 100.0 *
+                                   (ddr1 * u * u * dr1 + ddr2 * u * u * dr2 +
+                                    ddr3 * u * u * dr3 + ddr4 * u * u * dr4);
+  (fsim << next(q_dot)) ==
+      euq *u / 100.0 * q_dot +
           1.0 / 100.0 *
               (edb * u * u * db + edr1 * u * u * dr1 + edr2 * u * u * dr2 +
                edr3 * u * u * dr3 + edr4 * u * u * dr4);
-  fsim << next(r_dot) == fup * u / 100.0 * p + fur * u / 100.0 * r +
-                             1.0 / 100.0 *
-                                 (fdr1 * u * u * dr1 + fdr2 * u * u * dr2 +
-                                  fdr3 * u * u * dr3 + fdr4 * u * u * dr4);
+  (fsim << next(r_dot)) == fup *u / 100.0 * p + fur *u / 100.0 * r +
+                               1.0 / 100.0 *
+                                   (fdr1 * u * u * dr1 + fdr2 * u * u * dr2 +
+                                    fdr3 * u * u * dr3 + fdr4 * u * u * dr4);
 
   // DEFINE LEAST SQUARE FUNCTION:
   // -----------------------------
@@ -93,7 +93,7 @@ int main() {
   h << r;
   h << p_dot;
   h << q_dot;
-  r << r_dot;
+  h << r_dot;
   h << db;
   h << dr1;
   h << dr2;
@@ -114,17 +114,17 @@ int main() {
 
   ocp.minimizeLSQ(Q, h, ref);
   ocp.subjectTo(f);
-  //   ocp.subjectTo(-1 <= p <= 1);
-  //   ocp.subjectTo(-1 <= q <= 1);
-  //   ocp.subjectTo(-1 <= r <= 1);
-  //   ocp.subjectTo(-1 <= p_dot <= 1);
-  //   ocp.subjectTo(-1 <= q_dot <= 1);
-  //   ocp.subjectTo(-1 <= r_dot <= 1);
-  //   ocp.subjectTo(-1 <= db <= 1);
-  //   ocp.subjectTo(-1 <= dr1 <= 1);
-  //   ocp.subjectTo(-1 <= dr2 <= 1);
-  //   ocp.subjectTo(-1 <= dr3 <= 1);
-  //   ocp.subjectTo(-1 <= dr4 <= 1);
+  ocp.subjectTo(-1 <= p <= 1);
+  ocp.subjectTo(-1 <= q <= 1);
+  ocp.subjectTo(-1 <= r <= 1);
+  ocp.subjectTo(-1 <= p_dot <= 1);
+  ocp.subjectTo(-1 <= q_dot <= 1);
+  ocp.subjectTo(-1 <= r_dot <= 1);
+  ocp.subjectTo(-1 <= db <= 1);
+  ocp.subjectTo(-1 <= dr1 <= 1);
+  ocp.subjectTo(-1 <= dr2 <= 1);
+  ocp.subjectTo(-1 <= dr3 <= 1);
+  ocp.subjectTo(-1 <= dr4 <= 1);
 
   // SETTIONG UP (SIMULATED) PROCESS:
   // --------------------------------
@@ -160,10 +160,6 @@ int main() {
   uCon.setZero();
   VariablesGrid ySim;
 
-  //   uint aaa = 0;
-  //   aaa = controller.getNU();
-  //   std::cout << aaa << std::endl;
-
   if (controller.init(startTime, x0) != SUCCESSFUL_RETURN)
     exit(EXIT_FAILURE);
   controller.getU(uCon);
@@ -172,26 +168,24 @@ int main() {
     exit(EXIT_FAILURE);
   process.getY(ySim);
 
-  //   int nSteps = 0;
-  //   double currentTime = startTime;
+  int nSteps = 0;
+  double currentTime = startTime;
 
-  //   while (currentTime <= endTime) {
-  //     printf("\n*** Simulation Loop No. %d (starting at time %.3f) ***\n",
-  //     nSteps,
-  //            currentTime);
-  //     if (controller.step(currentTime, ySim.getLastVector()) !=
-  //     SUCCESSFUL_RETURN)
-  //       exit(EXIT_FAILURE);
-  //     controller.getU(uCon);
-  //     std::cout << uCon;
-  //     if (process.step(currentTime, currentTime + samplingTime, uCon) !=
-  //         SUCCESSFUL_RETURN)
-  //       exit(EXIT_FAILURE);
-  //     process.getY(ySim);
-  //     std::cout << ySim;
+  while (currentTime <= endTime) {
+    printf("\n*** Simulation Loop No. %d (starting at time %.3f) ***\n", nSteps,
+           currentTime);
+    if (controller.step(currentTime, ySim.getLastVector()) != SUCCESSFUL_RETURN)
+      exit(EXIT_FAILURE);
+    controller.getU(uCon);
+    std::cout << uCon;
+    if (process.step(currentTime, currentTime + samplingTime, uCon) !=
+        SUCCESSFUL_RETURN)
+      exit(EXIT_FAILURE);
+    process.getY(ySim);
+    std::cout << ySim;
 
-  //     ++nSteps;
-  //     currentTime = (double)nSteps * samplingTime;
-  //   }
+    ++nSteps;
+    currentTime = (double)nSteps * samplingTime;
+  }
   return EXIT_SUCCESS;
 }
