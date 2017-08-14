@@ -186,24 +186,26 @@ int main() {
 
   // Output planned control to file
   char outfilename[30]; // filename tobe output planned control.
-
+  double objvalue;
   while (currentTime <= endTime) {
     printf("\n*** Simulation Loop No. %d (starting at time %.3f) ***\n", nSteps,
            currentTime);
     if (controller.step(currentTime, ySim.getLastVector()) != SUCCESSFUL_RETURN)
       exit(EXIT_FAILURE);
     controller.getU(uCon);
-    std::cout << uCon;
+    std::cout << "Controls:" << std::endl << uCon << std::endl;
+    ;
     if (process.step(currentTime, currentTime + samplingTime, uCon) !=
         SUCCESSFUL_RETURN)
       exit(EXIT_FAILURE);
     process.getY(ySim);
-    std::cout << ySim;
+    std::cout << "State: " << std::endl << ySim << std::endl;
 
     // Output planned control to file
     sprintf(outfilename, "./controllog/controles_%d.txt", nSteps);
     alg.getControls(outfilename);
-
+    objvalue = alg.getObjectiveValue();
+    std::cout << "objective value: " << objvalue << std::endl;
     ++nSteps;
     currentTime = (double)nSteps * samplingTime;
   }
