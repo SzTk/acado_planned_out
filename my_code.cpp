@@ -113,6 +113,7 @@ int main() {
   OCP ocp(t_start, t_end, 25);
 
   ocp.minimizeLSQ(Q, h, ref);
+  ocp.minimizeLSQEndTerm(2.0 * Q, h, ref);
   ocp.subjectTo(f);
   ocp.subjectTo(-1 <= p <= 1);
   ocp.subjectTo(-1 <= q <= 1);
@@ -143,6 +144,18 @@ int main() {
   RealTimeAlgorithm alg(ocp, samplingTime);
   // alg.set(USE_REALTIME_ITERATIONS, NO);
 
+  // setup a logging object and flush it into the algorithm
+  std::ofstream myfile, myfile2;
+  myfile.open("kkt.txt", std::ios::out);
+  myfile2.open("obj.txt", std::ios::out);
+  LogRecord logRecord(LOG_AT_EACH_ITERATION, PS_DEFAULT);
+  logRecord << LOG_KKT_TOLERANCE;
+  LogRecord logRecord2(LOG_AT_EACH_ITERATION, PS_DEFAULT);
+  logRecord2 << LOG_OBJECTIVE_VALUE;
+
+  alg << logRecord;
+  alg << logRecord2;
+
   StaticReferenceTrajectory zeroReference;
 
   Controller controller(alg, zeroReference);
@@ -171,6 +184,9 @@ int main() {
   int nSteps = 0;
   double currentTime = startTime;
 
+  // Output planned control to file
+  char outfilename[30]; // filename tobe output planned control.
+
   while (currentTime <= endTime) {
     printf("\n*** Simulation Loop No. %d (starting at time %.3f) ***\n", nSteps,
            currentTime);
@@ -184,8 +200,18 @@ int main() {
     process.getY(ySim);
     std::cout << ySim;
 
+    // Output planned control to file
+    sprintf(outfilename, "./controllog/controles_%d.txt", nSteps);
+    alg.getControls(outfilename);
+
     ++nSteps;
     currentTime = (double)nSteps * samplingTime;
   }
+  alg.getLogRecord(logRecord);
+  alg.getLogRecord(logRecord2);
+  logRecord.print(myfile);
+  logRecord2.print(myfile2);
+  myfile.close();
+  myfile2.close();
   return EXIT_SUCCESS;
 }
